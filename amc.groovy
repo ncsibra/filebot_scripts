@@ -248,10 +248,10 @@ def acceptFile(f) {
 	}
 
 	// ignore iso images that do not contain a video disk structure
-	if (f.hasExtension('iso') && !f.isDisk()) {
-		log.fine "Ignore disk image: $f"
-		return false
-	}
+//	if (f.hasExtension('iso') && !f.isDisk()) {
+//		log.fine "Ignore disk image: $f"
+//		return false
+//	}
 
 	// ignore small video files
 	if (minFileSize > 0 && f.isVideo() && f.length() < minFileSize) {
@@ -266,10 +266,10 @@ def acceptFile(f) {
 	}
 
 	// ignore subtitle files without matching video file in the same or parent folder
-	if (f.isSubtitle() && ![f, f.dir].findResults{ it.dir }.any{ it.listFiles{ it.isVideo() && f.isDerived(it) }}) {
-		log.fine "Ignore orphaned subtitles: $f"
-		return false	
-	}
+//	if (f.isSubtitle() && ![f, f.dir].findResults{ it.dir }.any{ it.listFiles{ it.isVideo() && f.isDerived(it) }}) {
+//		log.fine "Ignore orphaned subtitles: $f"
+//		return false	
+//	}
 
 	// process only media files (accept audio files only if music mode is enabled)
 	return f.isVideo() || f.isSubtitle() || (music && f.isAudio())
