@@ -4,18 +4,20 @@
  */
 def scanVideoLibrary(host, port) {
 	def json = [jsonrpc: '2.0', method: 'VideoLibrary.Scan', id: 1]
-	def url = "http://$host:$port/jsonrpc?request=" + URLEncoder.encode(JsonOutput.toJson(json), 'UTF-8')
-
-	log.finest "GET: $url"
-	new URL(url).get()
+	postKodiRPC(host, port, json)
 }
 
 def showNotification(host, port, title, message, image) {
 	def json = [jsonrpc:'2.0', method:'GUI.ShowNotification', params: [title: title, message: message, image: image], id: 1]
-	def url = "http://$host:$port/jsonrpc?request=" + URLEncoder.encode(JsonOutput.toJson(json), 'UTF-8')
+	postKodiRPC(host, port, json)
+}
 
-	log.finest "GET: $url"
-	new URL(url).get()
+def postKodiRPC(host, port, json) {
+	def url = "http://$host:$port/jsonrpc"
+	def data = JsonOutput.toJson(json)
+
+	log.finest "POST: $url $data"
+	new URL(url).post(data.getBytes('UTF-8'), 'application/json', [:])
 }
 
 
@@ -46,7 +48,7 @@ def refreshEmbyLibrary(server, port, token) {
 	if (token) {
 		url += "?api_key=$token"
 	}
-	log.finest "GET: $url"
+	log.finest "POST: $url"
 	new URL(url).post([:], [:])
 }
 
@@ -314,13 +316,7 @@ def fetchMovieNfo(outputFile, i, movieFile) {
 			imdb(id:"tt" + (i.imdbId ?: 0).pad(7), "http://www.imdb.com/title/tt" + (i.imdbId ?: 0).pad(7))
 			tmdb(id:i.id, "http://www.themoviedb.org/movie/${i.id}")
 
-			/** <trailer> element not supported due to lack of specification on acceptable values for both Plex and Kodi
-			i.trailers.each{ t ->
-				t.sources.each { s, v ->
-					trailer(type:t.type, name:t.name, size:s, v)
-				}
-			}
-			**/
+			/** <trailer> element not supported due to lack of specification on acceptable values for both Plex and Kodi **/
 		}
 	}
 	xml.saveAs(outputFile)
